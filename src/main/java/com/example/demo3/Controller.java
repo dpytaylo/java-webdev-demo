@@ -1,7 +1,6 @@
 package com.example.demo3;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.http.*;
@@ -12,8 +11,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-@WebServlet(name = "helloServlet", value = "/")
-public class HelloServlet extends HttpServlet {
+@WebServlet(name = "controller", value = "/")
+public class Controller extends HttpServlet {
     private JakartaServletWebApplication application;
     private final TemplateEngine templateEngine = new TemplateEngine();
 
@@ -40,13 +39,19 @@ public class HelloServlet extends HttpServlet {
         final var exchange = application.buildExchange(request, response);
         WebContext webContext = new WebContext(exchange, exchange.getLocale());
 
-        List<User> users = List.of(
+        List<User> userList = List.of(
             new User(12, "a@email.com", "password"),
             new User(13, "b@email.com","abcdef")
         );
 
-        webContext.setVariable("users", users);
-        templateEngine.process("users", webContext, response.getWriter());
+        String command = request.getParameter("command");
+        if (command != null && command.equals("example")) {
+            webContext.setVariable("name", "Vasya");
+            templateEngine.process("example", webContext, response.getWriter());
+        } else {
+            webContext.setVariable("user_list", userList);
+            templateEngine.process("users", webContext, response.getWriter());
+        }
     }
 
     public void destroy() {
